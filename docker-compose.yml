@@ -214,6 +214,10 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      rabbitmq_host: bms-rmq  # Set hostname for other services to use
+      rabbitmq_port: 5672       # Set port for other services to use
+      rabbitmq_username: ${RABBITMQ_DEFAULT_USER} # Set username for other services
+      rabbitmq_password: ${RABBITMQ_DEFAULT_PASS} # Set password for other services
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -230,3 +234,6 @@ volumes:
   mongodb_data:
   redis_data:
   rabbitmq_data:
+secrets:  # Define your secrets here
+  jwt-secret:
+    file: ./jwt.secret 

@@ -1,4 +1,4 @@
-FROM openjdk:18-jdk-alpine
+FROM openjdk:17-jdk-alpine
 RUN apk --no-cache add curl
 
 # Declare ARG instructions to receive build-time arguments
@@ -13,20 +13,15 @@ ENV CONFIG_REPO_PATH=${CONFIG_REPO_PATH}
 ENV EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
 ENV CONFIG_SERVER_URL=${CONFIG_SERVER_URL}
 
-# Set the working directory
-WORKDIR /app
 
-# Copy Maven wrapper and pom.xml
+WORKDIR /app
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
-
-# Copy the source code
+RUN ./mvnw dependency:go-offline -B
 COPY src src
-
-# Use Maven to resolve dependencies and build/package the project
-RUN ./mvnw clean install -DskipTests
+RUN ./mvnw package -DskipTests
 
 EXPOSE 8765
 
-ENTRYPOINT ["java","-jar","target/api-gateway.jar"]
+ENTRYPOINT ["java","-jar","target/api-gateway-0.0.1-SNAPSHOT.jar"]

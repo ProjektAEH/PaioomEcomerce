@@ -15,6 +15,9 @@ public class JWTTokenUtil {
     @Value("${jwt.secret}")
     private String SECRET;
 
+    @Value("${jwt.validity}")
+    private long validity; // New field for jwt validity
+
     public UserDTO authorizeToken(String token) throws JWTVerificationException {
         var decodedToken = getDecodedToken(token);
         var email = retrieveEmailFromToken(decodedToken);
@@ -39,5 +42,4 @@ public class JWTTokenUtil {
     private Long retrieveUserIdFromToken(DecodedJWT decodedJWT) throws JWTVerificationException {
         return decodedJWT.getClaim("id").asLong();
     }
-
 }

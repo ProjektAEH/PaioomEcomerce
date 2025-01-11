@@ -1,18 +1,17 @@
-FROM openjdk:18-jdk-alpine
+FROM openjdk:17-jdk-alpine
 RUN apk --no-cache add curl
 
 # Declare ARG instructions to receive build-time arguments
 ARG BMS_PROFILE=production
-ARG CONFIG_REPO_PATH=/home/adel/Desktop/PaioomEcomerce/config-repo
+ARG CONFIG_REPO_PATH=/home/adel/Desktop/PaioomEcomerce/config-repo # This is not directly used inside the container, only during build
 ARG EUREKA_SERVER_URL=http://eureka-server:8761/eureka
 ARG CONFIG_SERVER_URL=http://config-server:8888
 
 # Set environment variables using the ARG values (or their defaults)
 ENV BMS_PROFILE=${BMS_PROFILE}
-ENV CONFIG_REPO_PATH=${CONFIG_REPO_PATH}
+# Removed CONFIG_REPO_PATH as it's not relevant inside the container
 ENV EUREKA_SERVER_URL=${EUREKA_SERVER_URL}
 ENV CONFIG_SERVER_URL=${CONFIG_SERVER_URL}
-
 
 # Set the working directory
 WORKDIR /app
@@ -30,6 +29,7 @@ COPY src src
 
 # Package the application
 RUN ./mvnw package -DskipTests
+
 EXPOSE 8001
 
 ENTRYPOINT ["java","-jar","target/user-service-0.0.1-SNAPSHOT.jar"]

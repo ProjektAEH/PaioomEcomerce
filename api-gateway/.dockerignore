@@ -1,0 +1,4 @@
+# Ignore the build output directory
+target/
+# Ignore the jwt secret file
+jwt.secret

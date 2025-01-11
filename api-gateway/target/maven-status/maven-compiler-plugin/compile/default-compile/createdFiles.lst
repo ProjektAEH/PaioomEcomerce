@@ -1,0 +1,4 @@
+com/bookstorems/apigateway/UserDTO.class
+com/bookstorems/apigateway/JWTTokenUtil.class
+com/bookstorems/apigateway/ApiGatewayApplication.class
+com/bookstorems/apigateway/RouteFilter.class

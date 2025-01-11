@@ -1,4 +1,4 @@
-FROM openjdk:18-jdk-alpine
+FROM openjdk:17-jdk-alpine
 RUN apk --no-cache add curl
 # Declare ARG instructions to receive build-time arguments
 ARG BMS_PROFILE=production

@@ -1,116 +1,122 @@
-# Bookstore Microservice
+# PaioomEcomerce: E-commerce Platform (Microservices with Spring Cloud)
 
-## Introduction
-This application demonstrates the microservice architecture using **Spring Cloud**. It is a basic application where we mimic the working of a bookstore platform, where in users can create their accounts, browse books, add/remove books from cart. Admins would be able to see all data about users and books. They will also be able to modify the books and authors on the platform. 
+## Overview
 
-### List of microservices
+**PaioomEcomerce** is a demonstration project showcasing a distributed e-commerce platform built using the **microservice architecture** with **Spring Cloud**. It simulates a basic online store where users can manage their accounts, browse products, maintain shopping carts, and administrators can manage platform data.
 
-- [User Service](./user-service) - Stores information about a user.
-- [Inventory Service](./inventory-service) - Stores business logic about books and authors.
-- [Cart Service](./cart-service) - Stores information about the cart of a user.
-- [Eureka Server](./eureka-server) - Service discovery server.
-- [Config Server](./config-server) - Configuration server.
-- [API Gateway](./api-gateway) - API gateway.
+## Services
 
-Each of the microservices have their own README.md file that provides more details about the microservice.
-The details include working, api documentation, events, etc.
+The platform consists of the following microservices:
 
-### Other technologies
+*   **`user-service`:** Manages user accounts and authentication.
+*   **`inventory-service`:** Handles product catalog, inventory, and related business logic.
+*   **`cart-service`:**  Manages user shopping carts.
+*   **`api-gateway`:** Provides a unified entry point for clients, routing requests to the appropriate services.
+*   **`config-server`:** Centralized configuration server for managing and distributing configurations to other services.
+*   **`eureka-server`:** Service discovery server, enabling services to locate and communicate with each other.
 
-- **Spring Cloud Config Server** for storing configurations
-- **Spring Cloud Netflix Eureka** for service discovery
-- **Spring Cloud Gateway** as the api gateway
-- **Resiliance4J** for implementing circuit breaker pattern
-- **Micrometer, OpenTelemetry, Zipkin** for observability
-- **RabbitMQ** for inter service communication
-- **MySQL** for `Product Service`
-- **MongoDB** for `Auth Service`, `User Service` and `Cart Service`
-- **Redis** to store details about books and authors in memory.
-- **Docker** for containerizing the services
-- **Docker Compose** to start the all the services and peripherals at once
+Each microservice has its own `README.md` with detailed information about its functionality, API documentation, events, etc.
 
-### Stack
-- Java 17
-- SpringBoot 3
-- Spring Cloud 2
-- Microservice Architecture
+## Technology Stack
 
-### Special permission
-- `admin` - Can access all the APIs
-- `user` - Can access all the APIs except the admin APIs
+*   **Java 17**
+*   **Spring Boot 3**
+*   **Spring Cloud 2022.0.x (e.g., Hoxton)**
+*   **Microservice Architecture**
+*   **Spring Cloud Config Server:** Centralized configuration management.
+*   **Spring Cloud Netflix Eureka:** Service discovery.
+*   **Spring Cloud Gateway:** API gateway.
+*   **Resilience4j:** Circuit breaker pattern implementation.
+*   **Micrometer, OpenTelemetry, Zipkin:** Observability and distributed tracing.
+*   **RabbitMQ:** Asynchronous inter-service communication.
+*   **MySQL:** Relational database for `inventory-service`.
+*   **MongoDB (version <= 4.4 due to AVX limitations):** Document database for `user-service` and `cart-service`.
+*   **Redis:** In-memory data store for caching or session management (if applicable).
+*   **Docker:** Containerization.
+*   **Docker Compose:** Orchestration of services and dependencies.
 
-To get admin privileges, you need to create an account with the email `admin@bookstore.com`.
+## Prerequisites
 
----
+*   **Java 17 JDK:** Ensure you have Java 17 JDK installed and configured.
+*   **Docker:** Install the latest version of Docker Desktop (recommended) or Docker Engine.
+*   **Docker Compose:**  Install the latest version of Docker Compose.
+*   **Git:**  Install Git to manage the configuration repository.
+*   **CPU without AVX instruction set support (Important Note):** Due to the use of an older MongoDB version (to avoid the AVX requirement), your system's CPU will not need to support AVX instructions.
+
 ## Getting Started
-This project can be run in two profiles:
-1. Development
-2. Production
-For development, you have to individually run all the pre-requisites and then run the services one by one. 
-For production, you can use docker-compose to start all the services and peripherals at once.
 
-### Running in `Development` mode
-1. We need to set up the pre-requisites before we do anything. For that, we need to fire up a few docker containers.
-   - Start a mysql instance
-     ```bash
-     docker run --name bms-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql
-     ```
-   - Start a mongodb instance
-     ```bash
-     docker run --name bms-mongodb -p 27017:27017 -e MONGODB_INIT_ROOT_USERNAME=admin -e MONGODB_INIT_ROOT_PASSWORD=admin -d mongo
-     ```
-   - Start a redis instance 
-     ```bash
-     docker run -d --name bms-redis -p 6379:6379 -e REDIS_USER=root -e REDIS_PASSWORD=root redis
-     ```
-   - Start a zipkin instance
-     ```bash
-     docker run --name bms-zipkin -p 9411:9411 -d openzipkin/zipkin
-     ```
-   - Start a rabbitmq instance
-     ```bash
-     docker run --name bms-rmq -p 5672:5672 -p 15672:15672 -e RABBITMQ_DEFAULT_USER=guest -e RABBITMQ_DEFAULT_PASS=guest -d rabbitmq
-     ```
-2. Once done, we need to set an environmental variable.
-   ```bash
-   export BMS_PROFILE=development (i)
-   export CONFIG_REPO_PATH=<path/to/config-repo> (ii)
-   ```
-   1. This will make the services start up in a development mode. We need this because the services will be fetching data from the config server based on the `spring.profile.active` property.
-   2. This is the path to the folder where you have the config-repo cloned. This is required because the config server will be fetching the configurations from this folder. Normally, it would be under `{USER_HOME}/path/to/bookstore-microservice/config-repo`. But, you can change it to any other location. Just make sure you set the `CONFIG_REPO_PATH` to that location.
-3. Now, we need to install the dependencies. Make sure you have `Java 17` installed locally. Once sure, you can proceed.
-   ```bash
-   cd bookstore-microservice
-   
-   folders=("api-gateway" "eureka-server" "config-server" "user-service" "cart-service" "inventory-service")
-   for folder in "${folders[@]}"; do
-      cd "$element" && ./mvnw clean install && cd ../
-   done
-   ```
-4. Finally, we can start the services one by one. Make sure you launch the services from the same terminal where you have set the temporary variables or from 
-some IDE that has the same environmental variables set in the launch configuration.
-   ```bash
-   cd bookstore-microservice
-   
-   folders=("eureka-server" "config-server" "api-gateway" "user-service" "cart-service" "inventory-service")
-   for folder in "${folders[@]}"; do
-      cd "$element" && ./mvnw spring-boot:run & && cd ../
-   done
-   ```
-5. You can now access the services at the following urls:
-    - `Eureka Server` - http://localhost:8761
-    - `Config Server` - http://localhost:8888
-    - `API Gateway` - http://localhost:8765
-    - `User Service` - http://localhost:8001
-    - `Cart Service` - http://localhost:8002
-    - `Inventory Service` - http://localhost:8004
-    - `Zipkin` - http://localhost:9411
-    - `RabbitMQ` - http://localhost:15672
-    - `MySQL` - http://localhost:3306
-    - `MongoDB` - http://localhost:27017
-    - `Redis` - http://localhost:6379
-   
-   Make sure that you make the API calls to **`API Gateway` ONLY**. Otherwise the authentication won't work. Enjoy!
+1.  **Clone the Repository:**
 
-### Running in `Production` mode
-TODO
+    ```bash
+    git clone <your-repository-url>
+    cd PaioomEcomerce
+    ```
+
+2.  **Configure the `config-repo`:**
+
+    *   Navigate to the `config-repo` directory:
+        ```bash
+        cd config-repo
+        ```
+    *   Initialize a Git repository (if not already initialized):
+        ```bash
+        git init
+        git add .
+        git commit -m "Initial commit"
+        ```
+    *   Set your Git user name and email (if you haven't already configured them globally):
+        ```bash
+        git config user.email "[email address removed]"
+        git config user.name "Your Name"
+        ```
+    *  Add configuration files for each service (e.g., `user-service.yml`, `inventory-service.yml`, `cart-service.yml`, `api-gateway.yml`) to the `config-repo` directory, make sure that the config files name match the spring application name of each service. If you want to have different configuration based on active profile, you can use `spring.config.activate.on-profile` property.
+    *   **Important:** In your configuration files, make sure the following settings are correct:
+        *   **Database URLs:** Use the Docker Compose service names as hostnames (e.g., `bms-mysql` for MySQL, `bms-mongodb` for MongoDB).
+        *   **RabbitMQ URL:** Use `bms-rmq` as the hostname, port `5672`, and the username/password you've defined in `docker-compose.yml`.
+        *   **Eureka Server URL:** `http://eureka-server:8761/eureka`
+        *   **Config Server URL:** `http://config-server:8888`
+    *   Commit the configuration files to the `config-repo`.
+
+3.  **Build the Project (Optional):**
+
+    *   If you need to build the microservices from source code, navigate to the root directory of the project (where `docker-compose.yml` is located) and run:
+        ```bash
+        docker-compose build
+        ```
+
+4.  **Start the Services:**
+
+    ```bash
+    docker-compose up -d
+    ```
+
+5.  **Monitor Service Startup:**
+
+    *   Use `docker ps -a` to check the status of the containers.
+    *   Use `docker logs <container_name>` to view the logs of individual services.
+    *   Wait for all services to become `healthy` (this might take a few minutes).
+
+## Accessing the Application
+
+Once all services are healthy, you can access the different components of your e-commerce platform:
+
+*   **Eureka Server:** [http://localhost:8761](http://localhost:8761)
+*   **Config Server:** [http://localhost:8888](http://localhost:8888)
+*   **API Gateway:** [http://localhost:8765](http://localhost:8765)
+*   **User Service:** [http://localhost:8001](http://localhost:8001)
+*   **Cart Service:** [http://localhost:8002](http://localhost:8002)
+*   **Inventory Service:** [http://localhost:8004](http://localhost:8004)
+*   **Zipkin (Distributed Tracing):** [http://localhost:9411](http://localhost:9411)
+*   **RabbitMQ Management UI:** [http://localhost:15672](http://localhost:15672) (Default credentials: `guest`/`guest`)
+*   **MySQL:** `localhost:3306` (Use a MySQL client to connect)
+*   **MongoDB:** `localhost:27017` (Use a MongoDB client to connect)
+*   **Redis:** `localhost:6379` (Use a Redis client to connect)
+
+**Note:** You will interact with the microservices primarily through the API Gateway using the routes you have defined.
+
+## Important Considerations
+
+*   **MongoDB Version:** Due to CPU compatibility limitations (no AVX support), this project uses MongoDB version 3.6. You might need to adjust your database interactions accordingly.
+*   **Unofficial MongoDB Image (If Applicable):** If you opted to use an unofficial MongoDB image to bypass the AVX requirement, be aware of the potential security and stability risks.
+*   **Error Handling:** This `README.md` provides basic setup instructions. For a production-ready application, you would need to implement robust error handling, logging, and monitoring.
+

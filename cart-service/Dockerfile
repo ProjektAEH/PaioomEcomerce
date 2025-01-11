@@ -1,4 +1,4 @@
-FROM openjdk:18-jdk-alpine
+FROM openjdk:17-jdk-alpine
 
 # Install necessary packages
 RUN apk --no-cache add curl

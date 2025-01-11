@@ -4,13 +4,11 @@ server:
 spring:
   application:
     name: config-server
-  profiles:
-    active: ${BMS_PROFILE:development}
   cloud:
     config:
       server:
         git:
-          uri: ${CONFIG_REPO_PATH}
+          uri: file:///app/config-repo # Correct path inside the container
 
 eureka:
   client:
