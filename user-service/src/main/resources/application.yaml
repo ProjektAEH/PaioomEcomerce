@@ -1,0 +1,39 @@
+spring:
+  profiles:
+    active: ${BMS_PROFILE:development} # Added default value for BMS_PROFILE
+  application:
+    name: user-service
+  config:
+    import: configserver:${CONFIG_SERVER_URL:http://config-server:8888} # Corrected URL
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_INIT_ROOT_USERNAME:admin}:${MONGODB_INIT_ROOT_PASSWORD:admin}@${MONGODB_HOST:mongodb}:27017/users?authSource=admin # Added mongodb:// and default values + auth db
+      database: users # Changed to use database name instead of full URI
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq} # Added default value
+    port: ${RABBITMQ_PORT:5672} # Added default value
+    username: ${RABBITMQ_DEFAULT_USER:guest} # Added default value
+    password: ${RABBITMQ_DEFAULT_PASS:guest} # Added default value
+    user-cart:
+      exchange: ${spring.rabbitmq.user-cart.exchange:user-cart-exchange} # Added default value
+      routing-key:
+        delete-user: ${spring.rabbitmq.user-cart.routing-key.delete-user:delete-user-rk} # Added default value
+      queue:
+        delete-user: ${spring.rabbitmq.user-cart.queue.delete-user:delete-user-queue} # Added default value
+
+server:
+  port: 8001
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

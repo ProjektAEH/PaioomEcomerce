@@ -1,0 +1,18 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: ${BMS_PROFILE:development}
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${CONFIG_REPO_PATH}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
